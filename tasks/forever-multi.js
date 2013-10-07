@@ -16,6 +16,7 @@
 var forever =require('forever');
 
 var done;		//for async handling
+var self;
 
 module.exports = function(grunt) {
 	grunt.registerMultiTask("foreverMulti", "Run and manage one or more forever scripts/commands", function() {
@@ -23,6 +24,9 @@ module.exports = function(grunt) {
 		Setup - Pull in grunt config for this task/target and extend from defaults.
 		@toc 0.
 		*/
+		
+		self =this;
+		
 		// grunt.log.writeln(this.target + ': ' + this.data);
 		var defaults ={
 			action: 'restart',
@@ -33,6 +37,10 @@ module.exports = function(grunt) {
 			if(this.data[xx] ===undefined) {
 				this.data[xx] =defaults[xx];
 			}
+		}
+		//allow overriding action with command line args/options
+		if(grunt.option('action')) {
+			this.data.action =grunt.option('action');
 		}
 		// grunt.log.writeln(JSON.stringify(this.data));
 		
@@ -73,7 +81,7 @@ module.exports = function(grunt) {
 			var xx;
 			try {
 				if(actionMap.hasOwnProperty(conf.action)) {
-					actionMap[conf.action].call(this, conf, params);
+					actionMap[conf.action].call(self, conf, params);
 				}
 				else {
 					var validActions ='';
@@ -93,7 +101,7 @@ module.exports = function(grunt) {
 		@method finish
 		*/
 		function finish(conf, params) {
-			grunt.log.writeln('foreverMulti:'+this.target+' done');
+			grunt.log.writeln('foreverMulti:'+self.target+' done');
 		}
 		
 		/**
@@ -158,7 +166,7 @@ module.exports = function(grunt) {
 		function start(conf, params, callback) {
 			grunt.log.writeln( 'Attempting to start ' + conf.file + ' as daemon.');
 			
-			done = this.async();
+			done = self.async();
 			list(conf, params, function(process, uid) {
 				// if found, be on our way without failing.
 				if(typeof process !== 'undefined') {
@@ -206,7 +214,7 @@ module.exports = function(grunt) {
 		function stop(conf, params, callback) {
 			log( 'Attempting to stop ' + conf.file + '...' );
 			
-			done = this.async();
+			done = self.async();
 			list(conf, params, function(process, uid) {
 				if( typeof process !== 'undefined' && uid ) {
 					log( forever.format(true,[process]) );
@@ -221,7 +229,7 @@ module.exports = function(grunt) {
 						}
 					})
 					.on('error', function(message) {
-						error( 'Error stopping uid: ' + uid + 'index: ' + index + '. [REASON] :: ' + message );
+						error( 'Error stopping uid: ' + uid + 'file: ' + conf.file + '. [REASON] :: ' + message );
 						if(callback) {
 							callback(false);
 						}
@@ -237,7 +245,7 @@ module.exports = function(grunt) {
 					else {
 						log('forever process undefined');
 					}
-					gruntRef.warn( index + ' not found in list of processes in forever.' );
+					warn( conf.file + ' not found in list of processes in forever.' );
 					if(callback) {
 						callback({});
 					}
@@ -255,13 +263,13 @@ module.exports = function(grunt) {
 		function restart(conf, params, callback) {
 			log( 'Attempting to restart ' + conf.file + '...' );
 			
-			done = this.async();
+			done = self.async();
 			list(conf, params, function(process, uid) {
 				if(typeof process !== 'undefined' && uid) {
 					log(forever.format(true,[process]));
 					forever.restart(uid)		//more specific
 					.on('error', function(message) {
-						error('Error restarting uid: '+uid+' index: ' + conf.file + '. [REASON] :: ' + message);
+						error('Error restarting uid: '+uid+' file: ' + conf.file + '. [REASON] :: ' + message);
 						if(callback) {
 							callback(false);
 						}
