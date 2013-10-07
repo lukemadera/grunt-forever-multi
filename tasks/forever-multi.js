@@ -2,6 +2,14 @@
 @todo
 - async / forever issues intermittently.. sometimes startDaemon is called but grunt finishes WITHOUT done() being called (from this.async()) - this causes the script the exit - sometimes before the forever process is started and it stops future execution of any other tasks in the multi-task.. I'm not sure what's going on here or how to fix..
 
+@usage
+- command line arguments (grunt.option)
+	- action to override the action (i.e. `--action=start` will run the forever start action even if the task config is set to 'restart' or 'stop' action)
+	
+`grunt foreverMulti`		//run all tasks in this multiTask with their defaults / standard config
+`grunt foreverMulti --action=restart`		//force a forever restart irregardless of what the config action is
+`grunt foreverMulti:appServer`		//run just one of the tasks
+
 @toc
 0. setup
 	0.1. warn

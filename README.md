@@ -22,19 +22,35 @@ grunt.loadNpmTasks('grunt-forever-multi');
 ## Forever Multi task
 
 ### Usage Examples
+Gruntfile.js
 ```js
 	foreverMulti: {
+		basic: {
+			file: 'test/run.js'
+		},
 		appServer: {
 			action: 'restart',
 			file: 'test/run.js',
 			options: ["-m '"+cfgJson.app.name+" port "+cfgJson.server.port+"'"]
 		},
 		testServer: {
-			// action: 'restart',		//default is restart if none specified
+			// action: 'restart',		//default is restart if no action specified
 			file: 'test/run.js',
 			options: ["config=test", "-m '"+cfgTestJson.app.name+" port "+cfgTestJson.server.port+"'"]
 		}
 	}
+```
+Command Line
+- command line arguments (grunt.option)
+	- action to override the action (i.e. `--action=start` will run the forever start action even if the task config is set to 'restart' or 'stop' action)
+
+```js
+# run all tasks in this multiTask with their defaults / standard config
+grunt foreverMulti
+# force a forever restart irregardless of what the config action is
+grunt foreverMulti --action=restart
+# run just one of the tasks
+grunt foreverMulti:appServer
 ```
 
 ## Development
