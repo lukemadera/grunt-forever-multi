@@ -42,7 +42,7 @@ Gruntfile.js
 ```
 Command Line
 - command line arguments (grunt.option)
-	- action to override the action (i.e. `--action=start` will run the forever start action even if the task config is set to 'restart' or 'stop' action)
+	- `action` to override the action (i.e. `--action=start` will run the forever start action even if the task config is set to `restart` or `stop` action)
 
 ```js
 # run all tasks in this multiTask with their defaults / standard config
@@ -61,15 +61,19 @@ The options / keys for each task mimic forever-monitor/forever: https://github.c
 
 Other options including, but not limited to, `silent`, `uid`, `max`, `command`, `sourceDir`, `watch`, `logFile`, `outFile`, `errFile` are NOT currently supported.
 
+## Why? (Use Cases)
+- For Continuous Integration - to restart your server(s) after a git push/webhook to get the file changes.
+	- i.e.: Use grunt to: 1. build new files/assets with the new code, 2. restart forever to update the running server/processes with the new code, 3. wait/timeout (sometimes necessary to allow the server time to fully restart), 4. run automated tests on the new code
+
 ## Development
 See https://npmjs.org/doc/developers.html for notes on publishing npm modules in general.
-- run grunt to ensure no issues
-- bump version number in package.json
-- update CHANGELOG (and potentially this README) file
-- git commit changes
-- npm publish
+- run `grunt` to ensure no issues
+- bump version number in `package.json`
+- update `CHANGELOG.md` (and potentially this `README.md`) file
+- `git commit` changes
+- `npm publish`
 - push to github (to update there as well)
 
 ## TODO
-- async / forever issues intermittently.. sometimes startDaemon is called but grunt finishes WITHOUT done() being called (from this.async()) - this causes the script the exit - sometimes before the forever process is started and it stops future execution of any other tasks in the multi-task.. I'm not sure what's going on here or how to fix..
+- async / forever issues intermittently.. sometimes `forever.startDaemon` is called but grunt finishes WITHOUT `done()` being called (from `this.async()`) - this causes the script to exit - sometimes before the forever process is started and it stops future execution of any other tasks in the multi-task.. I'm not sure what's going on here or how to fix..
 - add support for more (all?) forever options - i.e. `uid`, `command`, `watch`
