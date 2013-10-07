@@ -38,7 +38,7 @@ grunt.loadNpmTasks('grunt-forever-multi');
 ```
 
 ## Development
-(see https://npmjs.org/doc/developers.html for notes on publishing npm modules in general)
+See https://npmjs.org/doc/developers.html for notes on publishing npm modules in general.
 - run grunt to ensure no issues
 - bump version number in package.json
 - update CHANGELOG (and potentially this README) file
