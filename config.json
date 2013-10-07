@@ -1,0 +1,19 @@
+{
+	"name": "grunt-forever-multi-test",
+	"title":"Grunt Forever Multi Test",
+	"env": "development",
+	"app": {
+		"name": "project",
+		"title": "Project"
+	},
+	"server": {
+		"domain": "localhost",
+		"port": 3000,
+		"httpsPort": 443,
+		"socketPort": 3001,
+		"serverPath": "/",
+		"appPath": "/",
+		"staticFilePath": "/src/",
+		"staticPath": "/src/"
+	}
+}

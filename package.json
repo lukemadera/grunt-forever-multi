@@ -1,0 +1,47 @@
+{
+	"name": "grunt-forever-multi",
+	"description": "Run one or more forever scripts/actions (forked/based on grunt-forever)",
+	"version": "0.4.2",
+	"homepage": "https://github.com/lukemadera/grunt-forever-multi",
+	"author": {
+		"name": "Luke Madera",
+		"url": "https://github.com/lukemadera"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:lukemadera/grunt-forever-multi.git"
+	},
+	"bugs": {
+		
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/lukemadera/grunt-forever-multi/LICENSE.md"
+		}
+	],
+	"main": "Gruntfile.js",
+	"engines": {
+		"node": ">=0.10.0"
+	},
+	"scripts": {
+		"test": "grunt test"
+	},
+	"dependencies": {
+		"forever": ">=0.10.0"
+	},
+	"devDependencies": {
+		"grunt": "~0.4.1",
+		"grunt-contrib-jshint": "~0.3.0"
+	},
+	"peerDependencies": {
+		"grunt": "~0.4.1"
+	},
+	"keywords": [
+		"forever",
+		"forevergrunt",
+		"gruntplugin",
+		"plugins",
+		"daemon"
+	]
+}
