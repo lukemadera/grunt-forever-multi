@@ -22,14 +22,23 @@ grunt.loadNpmTasks('grunt-forever-multi');
 ## Forever Multi task
 
 ### Usage Examples
-
-TODO
 ```js
 	foreverMulti: {
+		appServer: {
+			action: 'restart',
+			file: 'test/run.js',
+			options: ["-m '"+cfgJson.app.name+" port "+cfgJson.server.port+"'"]
+		},
+		testServer: {
+			// action: 'restart',		//default is restart if none specified
+			file: 'test/run.js',
+			options: ["config=test", "-m '"+cfgTestJson.app.name+" port "+cfgTestJson.server.port+"'"]
+		}
 	}
 ```
 
-## Development (see https://npmjs.org/doc/developers.html for notes on publishing npm modules in general)
+## Development
+(see https://npmjs.org/doc/developers.html for notes on publishing npm modules in general)
 - run grunt to ensure no issues
 - bump version number in package.json
 - update CHANGELOG (and potentially this README) file
