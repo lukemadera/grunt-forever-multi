@@ -53,6 +53,13 @@ grunt foreverMulti --action=restart
 grunt foreverMulti:appServer
 ```
 
+### Options
+The options / keys for each task mimic forever-monitor/forever: https://github.com/nodejitsu/forever-monitor including a 'file' and 'action' key. The only supported options currently are:
+- `file` The file/script to run (i.e. `index.js` or `server.js`)
+- `action` What to run forever with - see: https://npmjs.org/package/forever. Only 'start', 'restart', 'stop' are supported currently.
+- `options` Command line arguments to pass to forever
+Other options including, but not limited to, 'silent', 'uid', 'max', 'command', 'sourceDir', 'watch', 'logFile', 'outFile', 'errFile' are NOT currently supported.
+
 ## Development
 See https://npmjs.org/doc/developers.html for notes on publishing npm modules in general.
 - run grunt to ensure no issues
@@ -64,3 +71,4 @@ See https://npmjs.org/doc/developers.html for notes on publishing npm modules in
 
 ## TODO
 - async / forever issues intermittently.. sometimes startDaemon is called but grunt finishes WITHOUT done() being called (from this.async()) - this causes the script the exit - sometimes before the forever process is started and it stops future execution of any other tasks in the multi-task.. I'm not sure what's going on here or how to fix..
+- add support for more (all?) forever options - i.e. 'uid', 'command', 'watch'
