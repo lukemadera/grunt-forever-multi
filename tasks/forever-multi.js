@@ -1,4 +1,6 @@
 /**
+@todo
+- async / forever issues intermittently.. sometimes startDaemon is called but grunt finishes WITHOUT done() being called (from this.async()) - this causes the script the exit - sometimes before the forever process is started and it stops future execution of any other tasks in the multi-task.. I'm not sure what's going on here or how to fix..
 
 @toc
 0. setup
@@ -15,8 +17,9 @@
 
 var forever =require('forever');
 
-var done;		//for async handling
-var self;
+//make objects since it's a multi task - need to keep them separate (since may be async)
+var done ={};		//for async handling
+var self ={};
 
 module.exports = function(grunt) {
 	grunt.registerMultiTask("foreverMulti", "Run and manage one or more forever scripts/commands", function() {
@@ -25,7 +28,9 @@ module.exports = function(grunt) {
 		@toc 0.
 		*/
 		
-		self =this;
+		var target =this.target;
+		self[target] =this;
+		done[target] = this.async();		//all actions are asynchronous
 		
 		// grunt.log.writeln(this.target + ': ' + this.data);
 		var defaults ={
@@ -81,7 +86,7 @@ module.exports = function(grunt) {
 			var xx;
 			try {
 				if(actionMap.hasOwnProperty(conf.action)) {
-					actionMap[conf.action].call(self, conf, params);
+					actionMap[conf.action].call(self[target], conf, params);
 				}
 				else {
 					var validActions ='';
@@ -101,7 +106,7 @@ module.exports = function(grunt) {
 		@method finish
 		*/
 		function finish(conf, params) {
-			grunt.log.writeln('foreverMulti:'+self.target+' done');
+			grunt.log.writeln('foreverMulti:'+self[target].target+' done');
 		}
 		
 		/**
@@ -154,7 +159,7 @@ module.exports = function(grunt) {
 				});
 			}
 			catch( e ) {
-				error( 'Error in trying to find process ' + conf.file + ' in forever. [REASON] :: ' + e.message );
+				error( 'Error in trying to find process ' + conf.file + ' in forever - [REASON] :: ' + e.message );
 				callback.call(null, undefined, uid);
 			}
 		}
@@ -166,43 +171,71 @@ module.exports = function(grunt) {
 		function start(conf, params, callback) {
 			grunt.log.writeln( 'Attempting to start ' + conf.file + ' as daemon.');
 			
-			done = self.async();
+			var doneCalled =false;
 			list(conf, params, function(process, uid) {
 				// if found, be on our way without failing.
 				if(typeof process !== 'undefined') {
 					log( conf.file + ' is already running.');		//not necessarily an error so don't want to abort
 					log( forever.format(true, [process]) );
+					doneCalled =true;
 					if(callback) {
 						callback({});
 					}
 					else {
-						done();
+						console.log('1 done: target: '+target);
+						done[target]();
 					}
 				}
 				else {
-					forever.startDaemon( conf.file, {
+					forever.startDaemon( conf.file, {		//has timing issues.. sometimes grunt ends before a done() is called...
+					// forever.start( conf.file, {		//doesn't work - does not actually start the process..
 						append: true,
 						max: 3,
 						options: conf.options
 					})
 					.on('start', function() {
+						doneCalled =true;
 						if(callback) {
 							callback({});
 						}
 						else {
-							done();
+							console.log('2 done: target: '+target);
+							done[target]();
 						}
 					})
 					.on('error', function(message) {
 						error( 'Error starting ' + conf.file + '. [REASON] :: ' + message );
+						doneCalled =true;
 						if(callback) {
 							callback(false);
 						}
 						else {
-							done(false);
+							console.log('3 done: target: '+target);
+							done[target](false);
 						}
 					})
+					/*
+					.on('stdout', function(data) {
+						log('stdout: '+data);
+					})
+					.on('stderr', function(data) {
+						log('stderr: '+data);
+					})
+					*/
 					;
+					
+					//failsafe to try to prevent grunt from ending early..
+					setTimeout(function() {
+						if(!doneCalled) {
+							if(callback) {
+								callback({});
+							}
+							else {
+								console.log('start timeout done: target: '+target);
+								done[target]();
+							}
+						}
+					}, 250);
 				}
 			});
 		}
@@ -214,7 +247,6 @@ module.exports = function(grunt) {
 		function stop(conf, params, callback) {
 			log( 'Attempting to stop ' + conf.file + '...' );
 			
-			done = self.async();
 			list(conf, params, function(process, uid) {
 				if( typeof process !== 'undefined' && uid ) {
 					log( forever.format(true,[process]) );
@@ -225,7 +257,8 @@ module.exports = function(grunt) {
 							callback({});
 						}
 						else {
-							done();
+							console.log('4 done: target: '+target);
+							done[target]();
 						}
 					})
 					.on('error', function(message) {
@@ -234,7 +267,8 @@ module.exports = function(grunt) {
 							callback(false);
 						}
 						else {
-							done(false);
+							console.log('5 done: target: '+target);
+							done[target](false);
 						}
 					});
 				}
@@ -245,12 +279,13 @@ module.exports = function(grunt) {
 					else {
 						log('forever process undefined');
 					}
-					warn( conf.file + ' not found in list of processes in forever.' );
+					log( conf.file + ' not found in list of processes in forever - already stopped?' );
 					if(callback) {
 						callback({});
 					}
 					else {
-						done();
+						console.log('6 done: target: '+target);
+						done[target]();
 					}
 				}
 			});
@@ -263,7 +298,6 @@ module.exports = function(grunt) {
 		function restart(conf, params, callback) {
 			log( 'Attempting to restart ' + conf.file + '...' );
 			
-			done = self.async();
 			list(conf, params, function(process, uid) {
 				if(typeof process !== 'undefined' && uid) {
 					log(forever.format(true,[process]));
@@ -274,7 +308,8 @@ module.exports = function(grunt) {
 							callback(false);
 						}
 						else {
-							done(false);
+							console.log('7 done: target: '+target);
+							done[target](false);
 						}
 					})
 					.on('restart', function() {
@@ -282,7 +317,8 @@ module.exports = function(grunt) {
 							callback({});
 						}
 						else {
-							done();
+							console.log('8 done: target: '+target);
+							done[target]();
 						}
 					})
 					;
@@ -294,13 +330,14 @@ module.exports = function(grunt) {
 					else {
 						log('forever process undefined');
 					}
-					log(conf.file + ' not found in list of processes in forever. Starting new instance...');
+					log(conf.file + ' not found in list of processes in forever - starting new instance...');
 					start(conf, params, function(ret) {
 						if(callback) {
 							callback({});
 						}
 						else {
-							done();
+							console.log('9 done: target: '+target);
+							done[target]();
 						}
 					});
 				}

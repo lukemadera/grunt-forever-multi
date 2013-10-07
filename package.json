@@ -1,7 +1,7 @@
 {
 	"name": "grunt-forever-multi",
 	"description": "Run one or more forever scripts/actions (forked/based on grunt-forever)",
-	"version": "0.4.213",
+	"version": "0.4.222",
 	"homepage": "https://github.com/lukemadera/grunt-forever-multi",
 	"author": {
 		"name": "Luke Madera",

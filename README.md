@@ -45,3 +45,6 @@ See https://npmjs.org/doc/developers.html for notes on publishing npm modules in
 - git commit changes
 - npm publish
 - push to github (to update there as well)
+
+## TODO
+- async / forever issues intermittently.. sometimes startDaemon is called but grunt finishes WITHOUT done() being called (from this.async()) - this causes the script the exit - sometimes before the forever process is started and it stops future execution of any other tasks in the multi-task.. I'm not sure what's going on here or how to fix..
