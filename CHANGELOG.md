@@ -1,3 +1,6 @@
+## v0.4.4
+- bump version (not sure what happened to v0.4.3..)
+
 ## v0.4.2
 - fix async 'done' bug that would cause 'restart' call to intermittently not work (task would complete before the forever restart)
 - converted to a multiTask so more than one forever script/call can be managed
