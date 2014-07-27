@@ -1,3 +1,6 @@
+## v0.5.0
+- bump version (getting npm 4.223 wanted version so going above that..)
+
 ## v0.4.4
 - bump version (not sure what happened to v0.4.3..)
 
